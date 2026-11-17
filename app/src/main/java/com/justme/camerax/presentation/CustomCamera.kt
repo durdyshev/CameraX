@@ -15,6 +15,7 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,6 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
@@ -49,7 +51,7 @@ fun CustomCamera(navController: NavController) {
         cameraProvider.bindToLifecycle(lifecycleOwner, cameraxSelector, preview, imageCapture)
         preview.setSurfaceProvider(previewView.surfaceProvider)
     }
-    Box(contentAlignment = Alignment.BottomCenter, modifier = Modifier.fillMaxSize()) {
+    Box(contentAlignment = Alignment.BottomCenter, modifier = Modifier.fillMaxSize().padding(horizontal = 64.dp)) {
         AndroidView({ previewView }, modifier = Modifier.fillMaxSize())
         Button(onClick = {
             captureImage(imageCapture, context,navController)
@@ -80,14 +82,40 @@ private fun captureImage(imageCapture: ImageCapture, context: Context, navContro
         ContextCompat.getMainExecutor(context),
         object : ImageCapture.OnImageSavedCallback {
             override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
-                BitmapClass.bitmap = BitmapFactory.decodeStream(
-                    context.contentResolver.openInputStream(outputFileResults.savedUri!!)
-                ).rotate(90F)
-                navController.popBackStack()
+                val savedUri = outputFileResults.savedUri ?: run {
+                    BitmapClass.detectedDescription = null
+                    navController.popBackStack()
+                    return
+                }
+
+                val capturedBitmap = BitmapFactory.decodeStream(
+                    context.contentResolver.openInputStream(savedUri)
+                )
+
+                if (capturedBitmap == null) {
+                    BitmapClass.detectedDescription = null
+                    navController.popBackStack()
+                    return
+                }
+
+                BitmapClass.bitmap = capturedBitmap
+                ImageLabelingHelper.recognize(
+                    capturedBitmap,
+                    onSuccess = { recognizedText ->
+                        BitmapClass.detectedDescription = recognizedText
+                        navController.popBackStack()
+                    },
+                    onError = {
+                        BitmapClass.detectedDescription = ""
+                        navController.popBackStack()
+                    }
+                )
             }
 
             override fun onError(exception: ImageCaptureException) {
                 println("Failed $exception")
+                BitmapClass.detectedDescription = null
+                navController.popBackStack()
             }
 
         })

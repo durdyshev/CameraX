@@ -48,19 +48,6 @@ fun StartupWizard(navController: NavHostController) {
                     letterSpacing = 3.sp
                 )
             }
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth(1.0F)
-                    .fillMaxHeight(1.0F)
-                    .padding(bottom = 24.dp),
-                verticalArrangement = Arrangement.Bottom,
-                horizontalAlignment = Alignment.CenterHorizontally
-
-            ) {
-                Button(onClick = { navController.navigate(Screen.ListScreen.route) }) {
-                    Text(text = "START")
-                }
-            }
 
         }
 

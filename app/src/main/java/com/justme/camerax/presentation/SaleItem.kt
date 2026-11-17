@@ -87,32 +87,7 @@ fun SaleItem(saleData: SaleData) {
                     .fillMaxWidth()
                     .padding(16.dp)
             ) {
-                // Başlık
-                Text(
-                    text = saleData.title,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color(0xFF042956),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.fillMaxWidth()
-                )
 
-                Spacer(modifier = Modifier.height(8.dp))
-
-                // Açıklama
-                Text(
-                    text = saleData.desc,
-                    fontSize = 13.sp,
-                    color = Color.Gray,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                // Fiyat ve İşlem Butonları
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -127,15 +102,17 @@ fun SaleItem(saleData: SaleData) {
                     // Fiyat
                     Column {
                         Text(
-                            text = "Fiyat",
+                            text = "Description",
                             fontSize = 11.sp,
                             color = Color.Gray
                         )
                         Text(
-                            text = "${String.format("%.2f", saleData.price)} ₺",
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color(0xFF042956)
+                            text = saleData.desc,
+                            fontSize = 13.sp,
+                            color = Color.Gray,
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.fillMaxWidth()
                         )
                     }
 
